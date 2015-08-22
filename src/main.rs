@@ -13,7 +13,7 @@ fn main() {
     let mut parameter = "".to_string();
     let mut when = "today".to_string();
 
-	// `parameter` and `when` variables are mutable thus we cannot borrow them more than once at a time
+    // `parameter` and `when` variables are mutable thus we cannot borrow them more than once at a time
     {
         let mut ap = ArgumentParser::new();
 
@@ -25,8 +25,26 @@ fn main() {
             .add_option(&["--when"], Store, "When, today or tomorrow.");
 
         ap.parse_args_or_exit();
-	}
+    }
 
-    println!("Rrasp!");
+    let when = if when == "today" { TODAY } else { TOMORROW };
+
+    let parameter = match parameter.as_ref() {
+        "Cu Cloudbase where Cu Potential>0" => "zsfclclmask",
+        "Thermal Updraft Velocity and B/S ratio" => "wstar_bsratio",
+        _ => "",
+    };
+
+    let mut urls = Vec::with_capacity(HOURS.len());
+
+    for h in HOURS.iter() {
+        urls.push(
+            RASP_URL.to_string() +
+            parameter + "." +
+            when + "." + h + "00" + SUFFIX
+        );
+    }
+
+    println!("URLs: {:?}", urls);
     println!("Parameter: {}, When: {}", parameter, when);
 }

@@ -6,6 +6,7 @@ const TODAY: &'static str = "curr";
 const TOMORROW: &'static str = "curr+1";
 const RASP_URL: &'static str = "http://rasp.linta.de/GERMANY/";
 const SUFFIX: &'static str = "lst.d2.png";
+const HOURS: [&'static str; 13] = ["07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
 
 
 fn main() {

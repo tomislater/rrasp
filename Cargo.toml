@@ -1,0 +1,5 @@
+[package]
+
+name = "rrasp"
+version = "0.0.1"
+authors = ["Tomasz Święcicki <tomislater@gmail.com>"]

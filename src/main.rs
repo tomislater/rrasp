@@ -1,5 +1,7 @@
 extern crate argparse;
 
+use std::process::exit;
+
 use argparse::{ArgumentParser,Store};
 
 const TODAY: &'static str = "curr";
@@ -32,7 +34,7 @@ fn main() {
     let parameter = match parameter.as_ref() {
         "Cu Cloudbase where Cu Potential>0" => "zsfclclmask",
         "Thermal Updraft Velocity and B/S ratio" => "wstar_bsratio",
-        _ => "",
+        _ => std::process::exit(1),
     };
 
     let mut urls = Vec::with_capacity(HOURS.len());
@@ -46,5 +48,4 @@ fn main() {
     }
 
     println!("URLs: {:?}", urls);
-    println!("Parameter: {}, When: {}", parameter, when);
 }

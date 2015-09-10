@@ -7,3 +7,4 @@ authors = ["Tomasz Święcicki <tomislater@gmail.com>"]
 [dependencies]
 
 argparse = "*"
+hyper = "*"

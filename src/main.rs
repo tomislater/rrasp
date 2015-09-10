@@ -1,6 +1,13 @@
 extern crate argparse;
+extern crate hyper;
+
+use std::io;
+use std::fs;
+use std::path::Path;
 
 use std::process::exit;
+
+use hyper::Client;
 
 use argparse::{ArgumentParser,Store};
 
@@ -9,6 +16,7 @@ const TOMORROW: &'static str = "curr+1";
 const RASP_URL: &'static str = "http://rasp.linta.de/GERMANY/";
 const SUFFIX: &'static str = "lst.d2.png";
 const HOURS: [&'static str; 13] = ["07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
+const IMAGES_DIR: &'static str = "images_data";
 
 
 fn main() {
@@ -24,7 +32,7 @@ fn main() {
             .required();
 
         ap.refer(&mut when)
-            .add_option(&["--when"], Store, "When, today or tomorrow.");
+            .add_option(&["--when"], Store, "When; today or tomorrow.");
 
         ap.parse_args_or_exit();
     }
@@ -47,5 +55,27 @@ fn main() {
         );
     }
 
-    println!("URLs: {:?}", urls);
+    fs::create_dir(IMAGES_DIR).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+    });
+
+    for url in urls {
+
+        let client = Client::new();
+        let mut res = client.get(&url).send().unwrap();
+
+        let splited_url: Vec<&str> = url.split("/").collect();
+        let file_name = String::from(IMAGES_DIR.to_string() + "/" + splited_url[4]);
+
+        let path = Path::new(&file_name);
+
+        let mut file = fs::File::create(&path).unwrap();
+
+        io::copy(&mut res, &mut file).unwrap();
+    }
+
+    fs::remove_dir_all(IMAGES_DIR).unwrap_or_else(|why| {
+        println!("! {:?}", why.kind());
+    });
+
 }

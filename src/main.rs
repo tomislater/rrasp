@@ -46,6 +46,8 @@ fn main() {
     let parameter_url = match parameter.as_ref() {
         "Cu Cloudbase where Cu Potential>0" => "zsfclclmask",
         "Thermal Updraft Velocity and B/S ratio" => "wstar_bsratio",
+        "BL Avg. Wind" => "blwind",
+        "OD Cloudbase where OD Potential>0" => "zblclmask",
         _ => std::process::exit(1),
     };
 

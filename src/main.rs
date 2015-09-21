@@ -4,6 +4,7 @@ extern crate hyper;
 use std::io;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 use std::process::exit;
 
@@ -38,10 +39,11 @@ fn main() {
     }
 
     // today or tomorrow
+    let when_filename = if when == "today" { "today" } else { "tomorrow" };
     let when = if when == "today" { TODAY } else { TOMORROW };
 
     // Which parameter
-    let parameter = match parameter.as_ref() {
+    let parameter_url = match parameter.as_ref() {
         "Cu Cloudbase where Cu Potential>0" => "zsfclclmask",
         "Thermal Updraft Velocity and B/S ratio" => "wstar_bsratio",
         _ => std::process::exit(1),
@@ -52,14 +54,14 @@ fn main() {
     for h in HOURS.iter() {
         urls.push(
             RASP_URL.to_string() +
-            parameter + "." +
+            parameter_url + "." +
             when + "." + h + "00" + SUFFIX
         );
     }
 
     // Create a dir for images
     fs::create_dir(IMAGES_DIR).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
+        println!("{:?}!", why.kind());
     });
 
     // Iterate each url and download a content
@@ -76,9 +78,18 @@ fn main() {
         io::copy(&mut res, &mut file).unwrap();
     }
 
+    // Convert PNGs into GIF
+    Command::new("convert")
+        .arg("-delay")
+        .arg("50")
+        .arg("-loop")
+        .arg("0")
+        .arg(IMAGES_DIR.to_string() + "/*png")
+        .arg(parameter.replace("/", "") + "_" + when_filename + ".gif")
+        .status().unwrap();
+
     // Remove the dir with images
     fs::remove_dir_all(IMAGES_DIR).unwrap_or_else(|why| {
-        println!("! {:?}", why.kind());
+        println!("{:?}!", why.kind());
     });
-
 }

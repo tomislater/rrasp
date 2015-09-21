@@ -37,16 +37,18 @@ fn main() {
         ap.parse_args_or_exit();
     }
 
+    // today or tomorrow
     let when = if when == "today" { TODAY } else { TOMORROW };
 
+    // Which parameter
     let parameter = match parameter.as_ref() {
         "Cu Cloudbase where Cu Potential>0" => "zsfclclmask",
         "Thermal Updraft Velocity and B/S ratio" => "wstar_bsratio",
         _ => std::process::exit(1),
     };
 
+    // Create URLs
     let mut urls = Vec::with_capacity(HOURS.len());
-
     for h in HOURS.iter() {
         urls.push(
             RASP_URL.to_string() +
@@ -55,25 +57,26 @@ fn main() {
         );
     }
 
+    // Create a dir for images
     fs::create_dir(IMAGES_DIR).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
     });
 
+    // Iterate each url and download a content
     for url in urls {
-
         let client = Client::new();
         let mut res = client.get(&url).send().unwrap();
 
         let splited_url: Vec<&str> = url.split("/").collect();
         let file_name = String::from(IMAGES_DIR.to_string() + "/" + splited_url[4]);
 
+        // Create a file and save the content
         let path = Path::new(&file_name);
-
         let mut file = fs::File::create(&path).unwrap();
-
         io::copy(&mut res, &mut file).unwrap();
     }
 
+    // Remove the dir with images
     fs::remove_dir_all(IMAGES_DIR).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
     });
